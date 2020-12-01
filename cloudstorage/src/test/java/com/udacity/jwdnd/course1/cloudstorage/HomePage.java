@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -116,7 +117,12 @@ public class HomePage {
     public boolean verifyNoteDeleted() throws InterruptedException {
         this.navNotesTab.click();
         Thread.sleep(1000);
-        return this.noteTitle.isDisplayed();
+        try {
+            return this.note.isDisplayed();
+        }
+        catch (NoSuchElementException ex) {
+            return false;
+        }
     }
 
     public void addCredential(String url, String username, String password) throws InterruptedException {
@@ -172,7 +178,12 @@ public class HomePage {
         Thread.sleep(1000);
         this.navCredentials.click();
         Thread.sleep(1000);
-        return credentialUrlDisplayed.isEnabled();
+        try {
+            return this.credentialUrlDisplayed.isDisplayed();
+        }
+        catch (NoSuchElementException ex) {
+            return false;
+        }
     }
 
 }

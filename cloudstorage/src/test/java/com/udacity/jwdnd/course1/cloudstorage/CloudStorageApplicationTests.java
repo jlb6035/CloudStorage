@@ -4,8 +4,11 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+
+import java.util.Random;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
@@ -21,14 +24,16 @@ class CloudStorageApplicationTests {
 	}
 
 	@BeforeEach
-	public void beforeEach() {
+	public void beforeEach() throws InterruptedException {
 		this.driver = new ChromeDriver();
+		Thread.sleep(2000);
 	}
 
 	@AfterEach
-	public void afterEach() {
+	public void afterEach() throws InterruptedException {
 		if (this.driver != null) {
 			driver.quit();
+			Thread.sleep(2000);
 		}
 	}
 
@@ -41,12 +46,13 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void signupTestHomePageAndLogout(){
+	public void signupTestHomePageAndLogout() throws InterruptedException {
 		signUpAndLogin();
+		Thread.sleep(2000);
 		Assertions.assertEquals("Home", driver.getTitle());
 		HomePage homePage = new HomePage(driver);
 		homePage.logout();
-		driver.get("http://localhost:" + this.port + "/");
+		Thread.sleep(2000);
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
@@ -125,10 +131,10 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void deleteCredentials() throws InterruptedException {
+		signUpAndLogin();
 		String username = "abc123";
 		String password = "abc1234";
 		String url = "google.com";
-		signUpAndLogin();
 		HomePage homePage = new HomePage(driver);
 		homePage.addCredential(url, username, password);
 		driver.get("http://localhost:" + this.port + "/");
@@ -139,12 +145,16 @@ class CloudStorageApplicationTests {
 	}
 
 	public void signUpAndLogin(){
+		String username = "user";
+		Random random = new Random();
+		int randomID = random.nextInt(1000 + 1);
+		username = username + randomID;
 		driver.get("http://localhost:" + this.port + "/signup");
 		SignupPage signupPage = new SignupPage(driver);
-		signupPage.signup("Jordan", "Boyd", "jlb123@gmail.com", "1224");
+		signupPage.signup("Jordan", "Boyd", username, ""+randomID);
 		driver.get("http://localhost:" + this.port + "/login");
 		LoginPage loginPage = new LoginPage(driver);
-		loginPage.login("jlb123@gmail.com", "1224");
+		loginPage.login(username, ""+randomID);
 	}
 
 }
